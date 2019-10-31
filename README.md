@@ -2,7 +2,7 @@
 
 If you are curious how a JavaScript framework like [Vue.js](https://vuejs.org) works behind the scenes, here is my personal approach to built my own framework.
 
-This propably won't be continued. I just wanted this to be like a prove of concept.
+This propably won't be continued. I just wanted this to be like a proof of concept.
 
 This just has two functions implemented.
 
