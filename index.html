@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>My Testpage</title>
+    <script src="daniel.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <h1>{{ message }}</h1>
+      <span>{{ introText }}</span>
+      <hr />
+      <h2>Here are some Affirmations for you!</h2>
+      <span d-for="affirmation in affirmations">{{ affirmation }}<br /></span>
+      <hr />
+      <h2>Task list</h2>
+      <ul>
+        <li>Start your day right!</li>
+        <li d-for="task in tasks">{{ task }}</li>
+        <li>Shower before sleep!</li>
+      </ul>
+    </div>
+  </body>
+  <script>
+    // Do it the same way vue.js does it
+    let app = new Daniel({
+      el: "#app",
+      data: {
+        message: "Hello World",
+        introText:
+          "This is an example to show the basics of a JavaScript Framework",
+        tasks: ["Clean up the kitchen", "Eat a healthy meal", "Stay focused"],
+        affirmations: [
+          "You look great today",
+          "You will become more and more wealthy"
+        ]
+      },
+      mounted() {
+        console.log("Page has successfully loaded...");
+      }
+    });
+  </script>
+</html>
