@@ -7,12 +7,19 @@ class Daniel {
       console.error("Daniel.js needs to have an el-variable");
       return;
     }
+    this.baseElement = object.el; // Save the Id of the Base-Element
+    this.template = document.querySelector(object.el).innerHTML; // Save the HTML template of the base element
     this.element = document.querySelector(object.el); // Store the root element
     this.data = object.data ? object.data : null; // Save the data variables if provided
 
+    this.__overrideData(); // New: Add some getters and setters to get reactivity
+
     this.$render(this.element); // Render the content of the element nodes
+
     // We have reached the mounted lifecycle
-    if (object.mounted) object.mounted();
+    // If mounted is set, then use the given function, otherwise set it to an empty function
+    this.mounted = object.mounted ? object.mounted : () => {};
+    this.mounted();
 
     // Let's see how long this will take to render
     console.log(
@@ -29,11 +36,56 @@ class Daniel {
       // Check for framework specific attributes
       el = this.__checkForAttributes(el);
 
-      if (childCount > 0) this.$render(el); // Go one instance deeper
+      if (childCount > 0) el = this.$render(el); // Go one instance deeper
       if (childCount === 0) {
         // Check the inner Text
         el = this.__displayData(el);
       }
+    }
+  }
+
+  // Update to rerender the HTML template from scratch...
+  $update() {
+    // Get the element of the actual template
+    let actualElement = document.querySelector(this.baseElement);
+    // Create a new element with the same type
+    let newElement = document.createElement(actualElement.nodeName);
+    // Give this element the same id
+    newElement.id = this.baseElement.replace("#", "");
+    // Rebuild this element innerHTML from the template
+    newElement.innerHTML = this.template;
+    // Add this element to the dom
+    actualElement.parentElement.insertBefore(
+      newElement,
+      actualElement.parentElement.children[
+        Array.from(actualElement.parentElement.children).indexOf(actualElement)
+      ]
+    );
+    // Remove the already renedered element
+    actualElement.parentElement.removeChild(actualElement);
+    // Make the new element the reference for this class
+    this.element = newElement;
+    // Render again
+    this.$render(this.element);
+  }
+
+  // MAGIC IS HAPPENING HERE
+  // Take the initial provided data object from the constructor
+  // Trigger an update everytime a value changes
+  __overrideData() {
+    let vm = this; // Just for the clearance
+    for (let i in vm.data) {
+      // Iterate through every variable in the data object
+      Object.defineProperty(vm, i, {
+        // Define the setter to actually trigger the $update function
+        set: val => {
+          vm.data[i] = val; // Save to the initial data object
+          vm.$update(); // Trigger update
+        },
+        get: () => {
+          return vm.data[i]; // Return the value of the inital data object
+        }
+      });
     }
   }
 
@@ -60,10 +112,10 @@ class Daniel {
 
       // If we find an actual variable for the placeholder, display the string stored in the variable
       // Otherwise just return the placeholder
-      if (Object.keys(this.data).indexOf(lookupVariable) !== -1) {
+      if (this[lookupVariable]) {
         el.innerText = el.innerText.replace(
           textNode,
-          this.data[lookupVariable].toString()
+          this[lookupVariable].toString()
         );
       }
     }
@@ -111,7 +163,7 @@ class Daniel {
       return el;
     }
     // Get the real data to loop through
-    let loopData = this.data[variableRoot];
+    let loopData = this[variableRoot];
     // Loop through the loop data
     let generatedNodes = []; // The new nodes to append
     for (let i in loopData) {
@@ -162,7 +214,7 @@ class Daniel {
 
   // Simple example of a static getting returning the version
   static get version() {
-    return "0.1.0";
+    return "0.2.0";
   }
 }
 

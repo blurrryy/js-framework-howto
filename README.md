@@ -8,6 +8,8 @@ This just has two functions implemented.
 
 1. Replace the {{placeholders}} with an actual string which is provided in the initial Object
 2. Create a simple for-loop that loops through an Array and replaces the basic element in the template
+3. Show how it works to overload the setter of a given variable to trigger rerender on change
+4. Implement an async API-Call to JSON-Placeholder to thow that it actually works!
 
 I've tried to comment my code as much as possible.
 
